@@ -8,11 +8,11 @@ export class AdminService {
     return 'Hello All Users!';
   }
   
-  searchUserByID(uid:number): string{
+  searchUserByID(uid: number): string{
     return 'User id: ' + uid;
   }
 
-  addUser(userdata:userdata):object{
+  addUsers(userdata: userdata): object{
     return userdata;
   }
   
