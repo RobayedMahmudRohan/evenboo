@@ -34,9 +34,7 @@ export class AdminController{
     }
 
     @Post('addorg')
-    @UsePipes(new ValidationPipe())
-    //create(@Body() organizerdata: organizerdata){}
-    @UseInterceptors(FileInterceptor('file',
+    @UseInterceptors(FileInterceptor('opp',
     { fileFilter: (req, file, cb) => {
     if (file.originalname.match(/^.*\.(jpg|webp|png|jpeg)$/))
     cb(null, true);
@@ -52,6 +50,7 @@ export class AdminController{
     },
     })
     }))
+    @UsePipes(new ValidationPipe())
     uploadFiles(@UploadedFile() file: Express.Multer.File, @Body() organizerdata: organizerdata): void {
     console.log(file.filename);
     console.log(organizerdata);
