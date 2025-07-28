@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsNotEmpty, IsNumber, Length, Matches, IsNumberString } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, IsNumber, Length, Matches, IsNumberString, IsIn } from 'class-validator';
 export class userdata{
     @IsString()
     @IsNotEmpty()
@@ -6,6 +6,7 @@ export class userdata{
 
     @IsString()
     @IsNotEmpty()
+    @Matches(/^[A-Za-z]+$/, {message: 'Name must contain only letters (no numbers or symbols)',})
     fname: string;
 
     @IsEmail()
@@ -27,6 +28,7 @@ export class userdata{
 export class organizerdata{
     @IsString()
     @IsNotEmpty()
+    @Matches(/^[A-Za-z]+$/, {message: 'Name must contain only letters (no numbers or symbols)',})
     oname: string;
 
     @IsEmail()
@@ -36,6 +38,7 @@ export class organizerdata{
 
     @IsString()
     @IsNotEmpty()
+    @IsIn(['Male', 'Female'], {message: 'Gender should be Male or Female.',})
     ogender: string;
 
     @IsNumberString()

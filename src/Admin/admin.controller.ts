@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Post,
-  Body,
-  UseInterceptors,
-  UploadedFile,
-  Res,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+import {Controller,Get,Param,Post,Body,UseInterceptors,UploadedFile,Res,UsePipes,ValidationPipe,} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AdminService } from './admin.service';
 import { userdata, organizerdata } from './admin.dto';
@@ -46,9 +35,8 @@ export class AdminController {
 
   @Post('addorg')
   @UsePipes(new ValidationPipe())
-  //create(@Body() organizerdata: organizerdata){}
   @UseInterceptors(
-    FileInterceptor('file', {
+    FileInterceptor('opp', {
       fileFilter: (req, file, cb) => {
         if (file.originalname.match(/^.*\.(jpg|webp|png|jpeg)$/))
           cb(null, true);
@@ -71,5 +59,6 @@ export class AdminController {
   ): void {
     console.log(file.filename);
     console.log(organizerdata);
+
   }
 }
