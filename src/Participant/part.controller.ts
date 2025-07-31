@@ -3,7 +3,10 @@ import {
   Get,
   Param,
   Post,
+  Patch,
   Body,
+  Delete,
+  ParseIntPipe,
   UseInterceptors,
   UploadedFile,
   Res,
@@ -14,6 +17,8 @@ import { PartService } from './part.service';
 import { userdata } from './part.dto';
 import { MulterError, diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { User2Service } from './part.service';
+import { CreateUser2Dto, UpdatePhoneDto } from './part.dto';
 
 @Controller('Participant')
 export class PartController {
@@ -54,5 +59,32 @@ export class PartController {
   ): void {
     console.log(file.filename);
     console.log(userdata);
+  }
+}
+@Controller('user2')
+export class User2Controller {
+  constructor(private readonly userService: User2Service) {}
+
+  @Post()
+  create(@Body() dto: CreateUser2Dto) {
+    return this.userService.create(dto);
+  }
+
+  @Patch(':id/phone')
+  updatePhone(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdatePhoneDto
+  ) {
+    return this.userService.updatePhone(id, dto);
+  }
+
+  @Get('null-name')
+  getUsersWithNullFullName() {
+    return this.userService.getUsersWithNullName();
+  }
+
+  @Delete(':id')
+  deleteUser(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.remove(id);
   }
 }

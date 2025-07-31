@@ -5,6 +5,10 @@ import {
   Matches,
   Length,
   IsNumberString,
+  IsOptional,
+  IsBoolean,
+  IsPhoneNumber,
+  IsNumber
 } from 'class-validator';
 
 export class userdata {
@@ -29,4 +33,20 @@ export class userdata {
   @IsString()
   @Matches(/^\d{17}$/, { message: 'Invalid NID format' })
   nidnumber: string;
+}
+export class CreateUser2Dto {
+  @IsOptional()
+  @IsString()
+  fullName?: string;
+
+  @IsNumber()
+  phone: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
+}
+export class UpdatePhoneDto {
+  @IsNumber()
+  phone: number;
 }
