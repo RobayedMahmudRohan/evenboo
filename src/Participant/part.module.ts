@@ -5,6 +5,7 @@ import { PartService } from './part.service';
 @Module({
   imports: [],
   controllers: [PartController],
-  providers: [PartService],
+  providers: [PartService], 
 })
+
 export class PartModule {}

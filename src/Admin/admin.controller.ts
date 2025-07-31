@@ -46,7 +46,6 @@ export class AdminController {
 
   @Post('addorg')
   @UsePipes(new ValidationPipe())
-  //create(@Body() organizerdata: organizerdata){}
   @UseInterceptors(
     FileInterceptor('file', {
       fileFilter: (req, file, cb) => {
