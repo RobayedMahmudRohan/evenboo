@@ -5,7 +5,8 @@ import { AdminModule } from './Admin/admin.module';
 import { OrgModule } from './Organizer/org.module';
 import { PartModule } from './Participant/part.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User2 } from './Participant/part.entity'
+import { User2, User } from './Participant/part.entity'
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [AdminModule, OrgModule, PartModule,TypeOrmModule.forRoot({
@@ -16,10 +17,11 @@ import { User2 } from './Participant/part.entity'
     password: 'anik123',
     database: 'evenboo',
     entities: [
-       User2
+       User2,
+       User
     ],
     synchronize: true,
-  })],
+  }), AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
