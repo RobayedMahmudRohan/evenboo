@@ -1,25 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { OrgData } from './org.dto';
+import { OrgEntity } from './org.entity';
 
 @Injectable()
 export class OrgService {
-    getAllOrg(): string {
-    return 'All Organizers!';
-  }
+    constructor(
+        @InjectRepository(OrgEntity)
+        private orgRepository: Repository<OrgEntity>,
+    ) {}
 
-  getOrgByID(id:number): string{
-    return 'get Organizer id ' + id;
-  }
+    async getAllOrg(): Promise<OrgEntity[]> {
+        return this.orgRepository.find();
+    }
 
-  createOrg(orgData: OrgData): string {
-    return 'Organizer created with OrgId: ' + orgData.orgId + ' and email: ' + orgData.email;
-  }
+    async getOrgByID(id: number): Promise<OrgEntity> {
+        const org = await this.orgRepository.findOne({ where: { id } });
+        if (!org) {
+            throw new NotFoundException(`Organizer with ID ${id} not found`);
+        }
+        return org;
+    }
 
-  updateOrg(id: number, orgData: OrgData): string {
-    return 'Organizer updated with id: ' + id + ' and email: ' + orgData.email;
-  }
+    async createOrg(orgData: OrgData): Promise<OrgEntity> {
+        const newOrg = this.orgRepository.create({
+            eventCountry: 'Unknown'
+        });
+        return this.orgRepository.save(newOrg);
+    }
 
-  addOrg(orgData: OrgData, filename: string): string {
-    return 'Organizer added with OrgId: ' + orgData.orgId + ', name: ' + orgData.name + ', email: ' + orgData.email + ', file: ' + filename;
-  }
+    async updateCountry(id: number, country: string): Promise<OrgEntity> {
+        const org = await this.getOrgByID(id);
+        org.eventCountry = country;
+        return this.orgRepository.save(org);
+    }
+
+    async getOrgsByEventDate(date: string): Promise<OrgEntity[]> {
+        return this.orgRepository
+            .createQueryBuilder('organizer')
+            .where('DATE(organizer.eventDate) = :date', { date })
+            .getMany();
+    }
+
+    async getOrgsWithUnknownCountry(): Promise<OrgEntity[]> {
+        return this.orgRepository.find({ where: { eventCountry: 'Unknown' } });
+    }
 }
