@@ -46,7 +46,10 @@ export class AuthService {
     const valid = await bcrypt.compare(dto.password, user.password);
     if (!valid) throw new UnauthorizedException('Invalid password');
 
-    const token = this.jwt.sign({ sub: user.id, email: user.email });
+    const token = this.jwt.sign(
+    { sub: user.id, email: user.email },
+    { secret: 'yourSuperSecretKeyThatIsVeryLong@123456789!' } 
+    );
     return { access_token: token };
   }
 }

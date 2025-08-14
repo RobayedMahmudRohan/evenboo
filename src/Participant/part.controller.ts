@@ -12,6 +12,8 @@ import {
   Res,
   UsePipes,
   ValidationPipe,
+  UseGuards,
+  Req
 } from '@nestjs/common';
 import { PartService } from './part.service';
 import { userdata } from './part.dto';
@@ -19,6 +21,7 @@ import { MulterError, diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User2Service } from './part.service';
 import { CreateUser2Dto, UpdatePhoneDto } from './part.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('Participant')
 export class PartController {
@@ -86,5 +89,13 @@ export class User2Controller {
   @Delete(':id')
   deleteUser(@Param('id', ParseIntPipe) id: number) {
     return this.userService.remove(id);
+  }
+}
+@Controller()
+export class ProfileController {
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Req() req) {
+    return req.user;
   }
 }

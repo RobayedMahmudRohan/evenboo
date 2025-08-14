@@ -15,7 +15,7 @@ export class User2 {
   isActive: boolean;
 
   @Column({ type: 'varchar', nullable: true })
-  fullName: string | null;
+  name: string | null;
 
   @Column({ type: 'bigint', unsigned: true })
   phone: number;

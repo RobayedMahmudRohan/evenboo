@@ -31,7 +31,7 @@ export class User2Service {
   }
 
   getUsersWithNullName() {
-    return this.userRepo.find({ where: { fullName: IsNull() } });
+    return this.userRepo.find({ where: { name: IsNull() } });
   }
 
   async remove(id: number) {
