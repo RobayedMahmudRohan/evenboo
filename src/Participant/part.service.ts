@@ -1,9 +1,10 @@
 import { userdata } from './part.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull  } from 'typeorm';
-import { User2 } from './part.entity';
-import { CreateUser2Dto, UpdatePhoneDto  } from './part.dto';
+import { User, User2 } from './part.entity';
+import { CreateUser2Dto, UpdatePhoneDto, UpdateProfileDto } from './part.dto';
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class PartService {
   loadevent(): string {
@@ -38,5 +39,66 @@ export class User2Service {
     const result = await this.userRepo.delete(id);
     if (result.affected === 0) throw new NotFoundException('User not found');
     return { message: 'User deleted successfully' };
+  }
+}
+
+//For Project
+@Injectable()
+export class ProfileService {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+  ) {}
+
+async loadevent(userId: number): Promise<string> {
+  const user = await this.userRepo.findOne({ where: { id: userId } });
+  if (!user) throw new NotFoundException('User not found');
+  return `Event Loaded! ${user.fullName} !`;
+}
+
+
+async getProfile(userId: number) {
+  const user = await this.userRepo.findOne({
+    where: { id: userId },
+    select: ['fullName', 'email', 'phone'],
+  });
+
+  if (!user) {
+    throw new NotFoundException('User not found');
+  }
+
+  return {
+    message: `Welcome Back ${user.fullName} !`,
+    Profile_Info: user,
+  };
+}
+
+  async updateProfile(userId: number, dto: UpdateProfileDto) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+    Object.assign(user, dto);
+    await this.userRepo.save(user);
+    return {
+      message: 'Profile updated successfully',
+      fullName: user.fullName,
+      email: user.email,
+      phone: user.phone,
+    };
+  }
+
+  async changePassword(userId: number, oldPassword: string, newPassword: string) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) throw new BadRequestException('Old password is incorrect');
+    user.password = await bcrypt.hash(newPassword, 10);
+    await this.userRepo.save(user);
+    return { message: 'Password changed successfully' };
+  }
+
+  async deleteUser(userId: number) {
+    const result = await this.userRepo.delete(userId);
+    if (result.affected === 0) throw new NotFoundException('User not found');
+    return { message: 'Account deleted successfully' };
   }
 }

@@ -3,6 +3,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Patch,
   Body,
   Delete,
@@ -15,12 +16,12 @@ import {
   UseGuards,
   Req
 } from '@nestjs/common';
-import { PartService } from './part.service';
+import { PartService, ProfileService } from './part.service';
 import { userdata } from './part.dto';
 import { MulterError, diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User2Service } from './part.service';
-import { CreateUser2Dto, UpdatePhoneDto } from './part.dto';
+import { CreateUser2Dto, UpdatePhoneDto, ChangePasswordDto, UpdateProfileDto } from './part.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('Participant')
@@ -91,11 +92,37 @@ export class User2Controller {
     return this.userService.remove(id);
   }
 }
-@Controller()
+
+@Controller('profile')
+@UseGuards(JwtAuthGuard)
 export class ProfileController {
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  getProfile(@Req() req) {
-    return req.user;
+  constructor(private readonly profileService: ProfileService) {}
+
+ @Get('allevent')
+async loadevent(@Req() req) {
+  return this.profileService.loadevent(req.user.userId);
+}
+
+
+  @Get()
+  async getProfile(@Req() req) {
+    return this.profileService.getProfile(req.user.userId);
+  }
+
+  @Patch()
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async updateProfile(@Req() req, @Body() dto: UpdateProfileDto) {
+    return this.profileService.updateProfile(req.user.userId, dto);
+  }
+
+  @Put('change-password')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async changePassword(@Req() req, @Body() dto: ChangePasswordDto) {
+    return this.profileService.changePassword(req.user.userId, dto.oldPassword, dto.newPassword);
+  }
+
+  @Delete()
+  async deleteAccount(@Req() req) {
+    return this.profileService.deleteUser(req.user.userId);
   }
 }

@@ -10,12 +10,14 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private repo: Repository<User>,
     private jwt: JwtService,
+    private mailerService: MailerService,
   ) {}
 
   async register(dto: RegisterDto, nidFilename: string) {
@@ -50,6 +52,17 @@ export class AuthService {
     { sub: user.id, email: user.email },
     { secret: 'yourSuperSecretKeyThatIsVeryLong@123456789!' } 
     );
+   try {
+  await this.mailerService.sendMail({
+    to: user.email,
+    subject: 'Login Successful',
+    text: `Hi ${user.fullName}, you have successfully logged in!`,
+  });
+  console.log('Email sent successfully');
+} catch (err) {
+  console.error('SendGrid error:', err);
+}
+
     return { access_token: token };
   }
 }

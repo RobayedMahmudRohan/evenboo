@@ -7,8 +7,9 @@ import {
   IsNumberString,
   IsOptional,
   IsBoolean,
+  IsNumber,
   IsPhoneNumber,
-  IsNumber
+  MinLength
 } from 'class-validator';
 
 export class userdata {
@@ -49,4 +50,31 @@ export class CreateUser2Dto {
 export class UpdatePhoneDto {
   @IsNumber()
   phone: number;
+}
+
+//For Project-Profile_Update_DTO
+export class UpdateProfileDto {
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  fullName?: string;
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(10)
+  phone?: string;
+}
+
+export class ChangePasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  oldPassword: string;
+
+  @IsString()
+  @MinLength(6)
+  newPassword: string;
 }
