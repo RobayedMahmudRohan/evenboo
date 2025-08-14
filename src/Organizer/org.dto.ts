@@ -1,33 +1,35 @@
-import { IsEmail, IsString, MinLength, Matches, IsIn, IsNumberString, IsOptional, isNumberString, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsString, MinLength, Matches, IsIn, IsNumberString, IsOptional, IsNotEmpty } from 'class-validator';
 
 export class OrgData {
+  @IsNotEmpty({ message: 'OrgId is required' })
   @IsNumberString()
   orgId: number;
 
+  @IsNotEmpty({ message: 'Name is required' })
   @IsString()
   @IsNotEmpty()
   @Matches(/^[A-Za-z]+$/, {message: 'Name must contain only letters (no numbers or symbols)',})
   name: string;
 
+  @IsNotEmpty({ message: 'Email is required' })
   @IsEmail()
-  @IsNotEmpty()
-  @Matches(/@aiub\.edu$/, {message: 'Email must be a valid aiub.edu email address',})
+  @Matches(/@aiub\.edu$/, { message: 'Email must contain aiub.edu domain' })
   email: string;
 
+  @IsNotEmpty({ message: 'Password is required' })
   @IsString()
-  @IsNotEmpty()
-  @MinLength(6)
-  @Matches(/^(?=.*[A-Z])/, {message: 'Password must contain minimum 6 digit length and a Upper case.',})
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  @Matches(/^(?=.*[A-Z])/, { message: 'Password must contain at least one uppercase character' })
   password: string;
 
+  @IsNotEmpty({ message: 'Gender is required' })
   @IsString()
-  @IsNotEmpty()
-  @IsIn(['male', 'female'], {message: 'Gender should be male or female.',})
+  @IsIn(['male', 'female'], { message: 'Gender must be either male or female' })
   gender: string;
 
-  @IsNumberString({})
-  @IsNotEmpty()
-  @Matches(/^01\d{9}$/, {message: 'Phone Number must contain 11 digits and starts with 01.',})
+  @IsNotEmpty({ message: 'Phone number is required' })
+  @IsNumberString({}, { message: 'Phone number must contain only numbers' })
+  @Matches(/^01\d{9}$/, { message: 'Phone number must be 11 digits and start with 01' })
   phoneNumber: string;
 
   @IsOptional()

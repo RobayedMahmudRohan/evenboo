@@ -7,6 +7,8 @@ import { PartModule } from './Participant/part.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User2, User } from './Participant/part.entity'
 import { AuthModule } from './auth/auth.module';
+import { OrgEntity } from './Organizer/org.entity';
+import { Organizer } from './Admin/admin.entity';
 
 @Module({
   imports: [AdminModule, OrgModule, PartModule,TypeOrmModule.forRoot({
@@ -18,9 +20,10 @@ import { AuthModule } from './auth/auth.module';
     database: 'evenboo',
     entities: [
        User2,
-       User
+       User,OrgEntity,Organizer
     ],
     synchronize: true,
+    autoLoadEntities: true
   }), AuthModule],
   controllers: [AppController],
   providers: [AppService],

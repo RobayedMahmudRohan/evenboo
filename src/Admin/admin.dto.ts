@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsNotEmpty, IsNumber, Length, Matches, IsNumberString, IsIn } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, IsNumber, Length, Matches, IsNumberString, IsIn, IsOptional, IsBoolean, IsInt, Min, isNotEmpty } from 'class-validator';
 export class userdata{
     @IsString()
     @IsNotEmpty()
@@ -53,3 +53,17 @@ export class organizerdata{
     opassword: string;
 
 }
+export class CreateOrganizerDto {
+  @IsString()
+  @IsNotEmpty()
+  userName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  fullName: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
+}
+
