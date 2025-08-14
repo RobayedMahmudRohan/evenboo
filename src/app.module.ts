@@ -13,8 +13,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-
-const sendGridApiKey = process.env.SENDGRID_API_KEY;
+const ApiKey = process.env.API_KEY;
 
 @Module({
   imports: [
@@ -36,12 +35,12 @@ const sendGridApiKey = process.env.SENDGRID_API_KEY;
     // MailerModule integration
     MailerModule.forRoot({
       transport: {
-        host: 'smtp.sendgrid.net', // SendGrid example
-        port: 587,
-        secure: false, // true for 465, false for other ports
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
         auth: {
-          user: 'apikey',
-          pass: sendGridApiKey,
+          user: 'evenboo121@gmail.com',
+          pass: ApiKey,
         },
       },
       defaults: {

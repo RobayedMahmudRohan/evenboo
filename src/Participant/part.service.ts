@@ -5,6 +5,7 @@ import { Repository, IsNull  } from 'typeorm';
 import { User, User2 } from './part.entity';
 import { CreateUser2Dto, UpdatePhoneDto, UpdateProfileDto } from './part.dto';
 import * as bcrypt from 'bcrypt';
+import { MailerService } from '@nestjs-modules/mailer';
 @Injectable()
 export class PartService {
   loadevent(): string {
@@ -48,6 +49,7 @@ export class ProfileService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    private mailerService: MailerService,
   ) {}
 
 async loadevent(userId: number): Promise<string> {
@@ -93,6 +95,16 @@ async getProfile(userId: number) {
     if (!isMatch) throw new BadRequestException('Old password is incorrect');
     user.password = await bcrypt.hash(newPassword, 10);
     await this.userRepo.save(user);
+     try {
+  await this.mailerService.sendMail({
+    to: user.email,
+    subject: 'Password Changed Successfully',
+    text: `Hi ${user.fullName}, you password have been changed succesfully!`,
+  });
+  console.log('Email sent successfully');
+} catch (err) {
+  console.error('SendGrid error:', err);
+}
     return { message: 'Password changed successfully' };
   }
 
