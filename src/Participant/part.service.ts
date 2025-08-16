@@ -6,6 +6,8 @@ import { User, User2 } from './part.entity';
 import { CreateUser2Dto, UpdatePhoneDto, UpdateProfileDto } from './part.dto';
 import * as bcrypt from 'bcrypt';
 import { MailerService } from '@nestjs-modules/mailer';
+import { Event } from '../Admin/admin.entity';
+
 @Injectable()
 export class PartService {
   loadevent(): string {
@@ -50,14 +52,21 @@ export class ProfileService {
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
     private mailerService: MailerService,
+    @InjectRepository(Event)
+    private readonly eventRepo: Repository<Event>,
   ) {}
 
-async loadevent(userId: number): Promise<string> {
-  const user = await this.userRepo.findOne({ where: { id: userId } });
-  if (!user) throw new NotFoundException('User not found');
-  return `Event Loaded! ${user.fullName} !`;
-}
+async loadevent(userId: number): Promise<{ message: string; events: Event[] }> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
 
+    const events = await this.eventRepo.find();
+
+    return {
+      message: `Event Loaded! ${user.fullName}!`,
+      events,
+    };
+  }
 
 async getProfile(userId: number) {
   const user = await this.userRepo.findOne({
@@ -114,3 +123,116 @@ async getProfile(userId: number) {
     return { message: 'Account deleted successfully' };
   }
 }
+
+@Injectable()
+export class ParticipantService {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    
+    @InjectRepository(Event)
+    private readonly eventRepository: Repository<Event>,
+  ) {}
+
+  // Register for an event
+  async registerEvent(userId: number, eventId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['registeredEvents'],
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    const event = await this.eventRepository.findOneBy({ id: eventId });
+    if (!event) throw new NotFoundException('Event not found');
+
+    // Prevent duplicate registration
+    const alreadyRegistered = user.registeredEvents.some(e => e.id === event.id);
+    if (alreadyRegistered) {
+      return {
+        message: 'You are already registered for this event',
+        event: {
+          id: event.id,
+          name: event.name,
+          location: event.location,
+          seat: event.seat,
+          price: event.price,
+          date: event.date,
+          time: event.time,
+        },
+      };
+    }
+
+    // Register the user
+    user.registeredEvents.push(event);
+    await this.userRepository.save(user);
+
+    return {
+      message: 'Event successfully registered',
+      user: {
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+      },
+      event: {
+        id: event.id,
+        name: event.name,
+        location: event.location,
+        seat: event.seat,
+        price: event.price,
+        date: event.date,
+        time: event.time,
+      },
+    };
+  }
+
+  // Get all registered events for a user
+  async getRegisteredEvents(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['registeredEvents'],
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    // Return event details only
+    return user.registeredEvents.map(event => ({
+      id: event.id,
+      name: event.name,
+      location: event.location,
+      seat: event.seat,
+      price: event.price,
+      date: event.date,
+      time: event.time,
+    }));
+  }
+
+  // Unregister from an event
+  async unregisterEvent(userId: number, eventId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['registeredEvents'],
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    const event = user.registeredEvents.find(e => e.id === eventId);
+    if (!event) {
+      return { message: 'You are not registered for this event' };
+    }
+
+    user.registeredEvents = user.registeredEvents.filter(e => e.id !== eventId);
+    await this.userRepository.save(user);
+
+    return {
+      message: 'Event successfully unregistered',
+      event: {
+        id: event.id,
+        name: event.name,
+        location: event.location,
+        seat: event.seat,
+        price: event.price,
+        date: event.date,
+        time: event.time,
+      },
+    };
+  }
+}
+

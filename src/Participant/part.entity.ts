@@ -4,7 +4,10 @@ import {
   Column,
   BeforeInsert,
   PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
+import { Event } from '../Admin/admin.entity';
 
 @Entity('user2')
 export class User2 {
@@ -49,4 +52,9 @@ export class User
 
   @Column()
   nidPath: string;
+
+  @ManyToMany(() => Event, (event) => event.users)
+  @JoinTable() // creates join table for many-to-many
+  registeredEvents: Event[];
 }
+

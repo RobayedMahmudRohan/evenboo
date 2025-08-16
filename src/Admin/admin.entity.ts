@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryColumn, BeforeInsert } from 'typeorm';
-
+import { Entity, Column, PrimaryColumn, BeforeInsert, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { User } from '../Participant/part.entity';
 @Entity('Organizers')
 export class Organizer {
   @PrimaryColumn()
@@ -18,4 +18,32 @@ export class Organizer {
   generateId() {
     this.id = Math.floor(Math.random() * 1000);
   }
+}
+
+//Event-Data_Anik
+@Entity()
+export class Event {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;
+
+  @Column()
+  location: string;
+
+  @Column()
+  seat: number;
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  price: number;
+
+  @Column()
+  date: string;
+
+  @Column()
+  time: string;
+
+  @ManyToMany(() => User, (user) => user.registeredEvents)
+  users: User[];
 }

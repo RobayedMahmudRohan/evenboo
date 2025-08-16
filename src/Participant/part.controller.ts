@@ -10,7 +10,6 @@ import {
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,
-  Res,
   UsePipes,
   ValidationPipe,
   UseGuards,
@@ -23,6 +22,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { User2Service } from './part.service';
 import { CreateUser2Dto, UpdatePhoneDto, ChangePasswordDto, UpdateProfileDto } from './part.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ParticipantService } from './part.service';
 
 @Controller('Participant')
 export class PartController {
@@ -124,5 +124,30 @@ async loadevent(@Req() req) {
   @Delete()
   async deleteAccount(@Req() req) {
     return this.profileService.deleteUser(req.user.userId);
+  }
+}
+@Controller()
+export class ParticipantController {
+  constructor(private readonly participantService: ParticipantService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Post('events/:eventId/register')
+  async registerEvent(@Param('eventId', ParseIntPipe) eventId: number, @Req() req) {
+    const userId = req.user.userId;
+    return this.participantService.registerEvent(userId, eventId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('user/events')
+  async getRegisteredEvents(@Req() req) {
+    const userId = req.user.userId; 
+    return this.participantService.getRegisteredEvents(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('events/:eventId/unregister')
+  async unregisterEvent(@Param('eventId', ParseIntPipe) eventId: number, @Req() req) {
+    const userId = req.user.userId; 
+    return this.participantService.unregisterEvent(userId, eventId);
   }
 }

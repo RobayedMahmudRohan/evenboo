@@ -8,7 +8,6 @@ import {
   IsOptional,
   IsBoolean,
   IsNumber,
-  IsPhoneNumber,
   MinLength
 } from 'class-validator';
 
