@@ -18,8 +18,8 @@ export class AdminService {
     return await this.organizerRepo.find();
   }
 
-  async findByFullNameSubstring(substring: string): Promise<Organizer[]> {
-  return await this.organizerRepo.find({where: {fullName: Like(`%${substring}%`),},});
+  async findByFullNameSubstring(substring: string): Promise<Organizer|null> {
+  return await this.organizerRepo.findOne({ where: {fullName: Like(`%${substring}%`)}});
 }
 
   async findByUserName(username: string): Promise<Organizer | null> {

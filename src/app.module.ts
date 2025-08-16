@@ -8,7 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User2, User } from './Participant/part.entity';
 import { AuthModule } from './auth/auth.module';
 import { OrgEntity } from './Organizer/org.entity';
-import { Organizer } from './Admin/admin.entity';
+import { Organizer,OrganizerData,Events } from './Admin/admin.entity';
 import { MailerModule } from '@nestjs-modules/mailer';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -28,7 +28,7 @@ const ApiKey = process.env.API_KEY;
       username: 'postgres',
       password: 'anik123',
       database: 'evenboo',
-      entities: [User2, User, OrgEntity, Organizer],
+      entities: [User2, User, OrgEntity, Organizer,OrganizerData,Events],
       synchronize: true,
       autoLoadEntities: true,
     }),
