@@ -45,8 +45,8 @@ export class OrganizerData {
   oprofilepicture?: string;
 }
 
-@Entity('events')
-export class Event {
+@Entity('Events')
+export class Events {
   @PrimaryGeneratedColumn()
   eventid: number;
 
