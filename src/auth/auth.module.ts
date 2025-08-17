@@ -6,14 +6,14 @@ import { AuthService } from './auth.service';
 import { User } from '../Participant/part.entity';
 import { JwtStrategy } from './jwt.strategy';
 
+//PROJECT_EVENBOO-AUTH_MODULE
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     JwtModule.register({
-  secret: 'yourSuperSecretKeyThatIsVeryLong@123456789!',
-  signOptions: { expiresIn: '1d' },
-}),
-
+      secret: 'yourSuperSecretKeyThatIsVeryLong@123456789!',
+      signOptions: { expiresIn: '1d' },
+    }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

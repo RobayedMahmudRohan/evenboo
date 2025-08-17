@@ -8,9 +8,10 @@ import {
   IsOptional,
   IsBoolean,
   IsNumber,
-  MinLength
+  MinLength,
 } from 'class-validator';
 
+//LAB_TASK
 export class userdata {
   @IsString()
   @IsNotEmpty()
@@ -34,6 +35,8 @@ export class userdata {
   @Matches(/^\d{17}$/, { message: 'Invalid NID format' })
   nidnumber: string;
 }
+
+//PROJECT_EVENBOO_DTO
 export class CreateUser2Dto {
   @IsOptional()
   @IsString()
@@ -50,8 +53,6 @@ export class UpdatePhoneDto {
   @IsNumber()
   phone: number;
 }
-
-//For Project-Profile_Update_DTO
 export class UpdateProfileDto {
   @IsOptional()
   @IsString()
@@ -67,7 +68,6 @@ export class UpdateProfileDto {
   @MinLength(10)
   phone?: string;
 }
-
 export class ChangePasswordDto {
   @IsString()
   @IsNotEmpty()

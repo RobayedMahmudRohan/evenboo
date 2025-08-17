@@ -1,13 +1,18 @@
 import { userdata } from './part.dto';
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull  } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { User, User2 } from './part.entity';
 import { CreateUser2Dto, UpdatePhoneDto, UpdateProfileDto } from './part.dto';
 import * as bcrypt from 'bcrypt';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Event } from '../Admin/admin.entity';
 
+//LAB_TASK
 @Injectable()
 export class PartService {
   loadevent(): string {
@@ -45,7 +50,7 @@ export class User2Service {
   }
 }
 
-//For Project
+//PROJECT_EVENBOO_SERVICE-PROFILE_RELATED
 @Injectable()
 export class ProfileService {
   constructor(
@@ -56,7 +61,9 @@ export class ProfileService {
     private readonly eventRepo: Repository<Event>,
   ) {}
 
-async loadevent(userId: number): Promise<{ message: string; events: Event[] }> {
+  async loadevent(
+    userId: number,
+  ): Promise<{ message: string; events: Event[] }> {
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException('User not found');
 
@@ -68,21 +75,21 @@ async loadevent(userId: number): Promise<{ message: string; events: Event[] }> {
     };
   }
 
-async getProfile(userId: number) {
-  const user = await this.userRepo.findOne({
-    where: { id: userId },
-    select: ['fullName', 'email', 'phone'],
-  });
+  async getProfile(userId: number) {
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+      select: ['fullName', 'email', 'phone'],
+    });
 
-  if (!user) {
-    throw new NotFoundException('User not found');
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      message: `Welcome Back ${user.fullName} !`,
+      Profile_Info: user,
+    };
   }
-
-  return {
-    message: `Welcome Back ${user.fullName} !`,
-    Profile_Info: user,
-  };
-}
 
   async updateProfile(userId: number, dto: UpdateProfileDto) {
     const user = await this.userRepo.findOne({ where: { id: userId } });
@@ -97,23 +104,27 @@ async getProfile(userId: number) {
     };
   }
 
-  async changePassword(userId: number, oldPassword: string, newPassword: string) {
+  async changePassword(
+    userId: number,
+    oldPassword: string,
+    newPassword: string,
+  ) {
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException('User not found');
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) throw new BadRequestException('Old password is incorrect');
     user.password = await bcrypt.hash(newPassword, 10);
     await this.userRepo.save(user);
-     try {
-  await this.mailerService.sendMail({
-    to: user.email,
-    subject: 'Password Changed Successfully',
-    text: `Hi ${user.fullName}, you password have been changed succesfully!`,
-  });
-  console.log('Email sent successfully');
-} catch (err) {
-  console.error('SendGrid error:', err);
-}
+    try {
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Password Changed Successfully',
+        text: `Hi ${user.fullName}, you password have been changed succesfully!`,
+      });
+      console.log('Email sent successfully');
+    } catch (err) {
+      console.error('SendGrid error:', err);
+    }
     return { message: 'Password changed successfully' };
   }
 
@@ -124,17 +135,17 @@ async getProfile(userId: number) {
   }
 }
 
+//PROJECT_EVENBOO_SERVICE-EVENT_RELATED
 @Injectable()
 export class ParticipantService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    
+
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
   ) {}
 
-  // Register for an event
   async registerEvent(userId: number, eventId: number) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -145,8 +156,9 @@ export class ParticipantService {
     const event = await this.eventRepository.findOneBy({ id: eventId });
     if (!event) throw new NotFoundException('Event not found');
 
-    // Prevent duplicate registration
-    const alreadyRegistered = user.registeredEvents.some(e => e.id === event.id);
+    const alreadyRegistered = user.registeredEvents.some(
+      (e) => e.id === event.id,
+    );
     if (alreadyRegistered) {
       return {
         message: 'You are already registered for this event',
@@ -162,7 +174,6 @@ export class ParticipantService {
       };
     }
 
-    // Register the user
     user.registeredEvents.push(event);
     await this.userRepository.save(user);
 
@@ -185,7 +196,6 @@ export class ParticipantService {
     };
   }
 
-  // Get all registered events for a user
   async getRegisteredEvents(userId: number) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -193,8 +203,7 @@ export class ParticipantService {
     });
     if (!user) throw new NotFoundException('User not found');
 
-    // Return event details only
-    return user.registeredEvents.map(event => ({
+    return user.registeredEvents.map((event) => ({
       id: event.id,
       name: event.name,
       location: event.location,
@@ -205,7 +214,6 @@ export class ParticipantService {
     }));
   }
 
-  // Unregister from an event
   async unregisterEvent(userId: number, eventId: number) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -213,12 +221,14 @@ export class ParticipantService {
     });
     if (!user) throw new NotFoundException('User not found');
 
-    const event = user.registeredEvents.find(e => e.id === eventId);
+    const event = user.registeredEvents.find((e) => e.id === eventId);
     if (!event) {
       return { message: 'You are not registered for this event' };
     }
 
-    user.registeredEvents = user.registeredEvents.filter(e => e.id !== eventId);
+    user.registeredEvents = user.registeredEvents.filter(
+      (e) => e.id !== eventId,
+    );
     await this.userRepository.save(user);
 
     return {
@@ -235,4 +245,3 @@ export class ParticipantService {
     };
   }
 }
-

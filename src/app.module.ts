@@ -8,13 +8,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User2, User } from './Participant/part.entity';
 import { AuthModule } from './auth/auth.module';
 import { OrgEntity } from './Organizer/org.entity';
-import { Organizer,Event } from './Admin/admin.entity';
+import { Organizer, Event } from './Admin/admin.entity';
 import { MailerModule } from '@nestjs-modules/mailer';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
 const ApiKey = process.env.API_KEY;
 
+//PROJECT_EVENBOO-DATABASE_CONNECTION(FROM_ANIK)
 @Module({
   imports: [
     AdminModule,
@@ -28,11 +29,12 @@ const ApiKey = process.env.API_KEY;
       username: 'postgres',
       password: 'anik123',
       database: 'evenboo',
-      entities: [User2, User, OrgEntity, Organizer,Event],
+      entities: [User2, User, OrgEntity, Organizer, Event],
       synchronize: true,
       autoLoadEntities: true,
     }),
-    // MailerModule integration
+
+    //PROJECT_EVENBOO-MAILER_CONNECTION(FROM_ANIK)
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',

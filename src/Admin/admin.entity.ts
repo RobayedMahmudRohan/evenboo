@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryColumn, BeforeInsert, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  BeforeInsert,
+  PrimaryGeneratedColumn,
+  ManyToMany,
+} from 'typeorm';
 import { User } from '../Participant/part.entity';
 @Entity('Organizers')
 export class Organizer {
@@ -20,7 +27,7 @@ export class Organizer {
   }
 }
 
-//Event-Data_Anik
+//PROJECT_EVENBOO-EVENT_TABLE_ENTITY(FROM ANIK)
 @Entity()
 export class Event {
   @PrimaryGeneratedColumn()

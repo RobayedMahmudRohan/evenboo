@@ -13,17 +13,26 @@ import {
   UsePipes,
   ValidationPipe,
   UseGuards,
-  Req
+  Req,
 } from '@nestjs/common';
-import { PartService, ProfileService } from './part.service';
-import { userdata } from './part.dto';
+import {
+  PartService,
+  ProfileService,
+  User2Service,
+  ParticipantService,
+} from './part.service';
+import {
+  userdata,
+  CreateUser2Dto,
+  UpdatePhoneDto,
+  ChangePasswordDto,
+  UpdateProfileDto,
+} from './part.dto';
 import { MulterError, diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { User2Service } from './part.service';
-import { CreateUser2Dto, UpdatePhoneDto, ChangePasswordDto, UpdateProfileDto } from './part.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ParticipantService } from './part.service';
 
+//LAB_TASK
 @Controller('Participant')
 export class PartController {
   constructor(private readonly partService: PartService) {}
@@ -65,6 +74,8 @@ export class PartController {
     console.log(userdata);
   }
 }
+
+//LAB_TASK
 @Controller('user2')
 export class User2Controller {
   constructor(private readonly userService: User2Service) {}
@@ -77,7 +88,7 @@ export class User2Controller {
   @Patch(':id/phone')
   updatePhone(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdatePhoneDto
+    @Body() dto: UpdatePhoneDto,
   ) {
     return this.userService.updatePhone(id, dto);
   }
@@ -93,17 +104,16 @@ export class User2Controller {
   }
 }
 
+//PROJECT_EVENBOO_CONTROLLER
 @Controller('profile')
 @UseGuards(JwtAuthGuard)
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
- @Get('allevent')
-async loadevent(@Req() req) {
-  return this.profileService.loadevent(req.user.userId);
-}
-
-
+  @Get('allevent')
+  async loadevent(@Req() req) {
+    return this.profileService.loadevent(req.user.userId);
+  }
   @Get()
   async getProfile(@Req() req) {
     return this.profileService.getProfile(req.user.userId);
@@ -118,7 +128,11 @@ async loadevent(@Req() req) {
   @Put('change-password')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async changePassword(@Req() req, @Body() dto: ChangePasswordDto) {
-    return this.profileService.changePassword(req.user.userId, dto.oldPassword, dto.newPassword);
+    return this.profileService.changePassword(
+      req.user.userId,
+      dto.oldPassword,
+      dto.newPassword,
+    );
   }
 
   @Delete()
@@ -132,7 +146,10 @@ export class ParticipantController {
 
   @UseGuards(JwtAuthGuard)
   @Post('events/:eventId/register')
-  async registerEvent(@Param('eventId', ParseIntPipe) eventId: number, @Req() req) {
+  async registerEvent(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Req() req,
+  ) {
     const userId = req.user.userId;
     return this.participantService.registerEvent(userId, eventId);
   }
@@ -140,14 +157,17 @@ export class ParticipantController {
   @UseGuards(JwtAuthGuard)
   @Get('user/events')
   async getRegisteredEvents(@Req() req) {
-    const userId = req.user.userId; 
+    const userId = req.user.userId;
     return this.participantService.getRegisteredEvents(userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('events/:eventId/unregister')
-  async unregisterEvent(@Param('eventId', ParseIntPipe) eventId: number, @Req() req) {
-    const userId = req.user.userId; 
+  async unregisterEvent(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Req() req,
+  ) {
+    const userId = req.user.userId;
     return this.participantService.unregisterEvent(userId, eventId);
   }
 }

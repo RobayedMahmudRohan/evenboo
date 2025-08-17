@@ -12,6 +12,7 @@ import { LoginDto } from './dto/login.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
+//PROJECT_EVENBOO-AUTH_CONTROLLER
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

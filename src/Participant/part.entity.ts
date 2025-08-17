@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Event } from '../Admin/admin.entity';
 
+//LAB_TASK
 @Entity('user2')
 export class User2 {
   @PrimaryColumn()
@@ -29,22 +30,19 @@ export class User2 {
   }
 }
 
-//For my project
-
-//User Registration Entity- ID, Fullname, Email, Phone, Password, NID Path 
+//PROJECT_EVENBOO_ENTITY
 @Entity('User')
-export class User
-{
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   fullName: string;
 
-  @Column({unique: true})
+  @Column({ unique: true })
   email: string;
 
-  @Column({unique: true})
+  @Column({ unique: true })
   phone: string;
 
   @Column()
@@ -54,7 +52,6 @@ export class User
   nidPath: string;
 
   @ManyToMany(() => Event, (event) => event.users)
-  @JoinTable() // creates join table for many-to-many
+  @JoinTable()
   registeredEvents: Event[];
 }
-

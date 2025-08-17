@@ -12,6 +12,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 
+//PROJECT_EVENBOO-AUTH_SERVICE
 @Injectable()
 export class AuthService {
   constructor(
@@ -49,19 +50,19 @@ export class AuthService {
     if (!valid) throw new UnauthorizedException('Invalid password');
 
     const token = this.jwt.sign(
-    { sub: user.id, email: user.email },
-    { secret: 'yourSuperSecretKeyThatIsVeryLong@123456789!' } 
+      { sub: user.id, email: user.email },
+      { secret: 'yourSuperSecretKeyThatIsVeryLong@123456789!' },
     );
-   try {
-  await this.mailerService.sendMail({
-    to: user.email,
-    subject: 'Login Successful',
-    text: `Hi ${user.fullName}, you have successfully logged in!`,
-  });
-  console.log('Email sent successfully');
-} catch (err) {
-  console.error('SendGrid error:', err);
-}
+    try {
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Login Successful',
+        text: `Hi ${user.fullName}, you have successfully logged in!`,
+      });
+      console.log('Email sent successfully');
+    } catch (err) {
+      console.error('Mailer error:', err);
+    }
 
     return { access_token: token };
   }

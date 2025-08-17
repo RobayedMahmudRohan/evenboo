@@ -1,26 +1,19 @@
-import
-{
-    IsEmail,
-    IsNotEmpty,
-    Matches,
-    MinLength,
-    IsString,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, MinLength, IsString } from 'class-validator';
 
-export class RegisterDto
-{
-    @IsNotEmpty()
-    fullName: string;
+//PROJECT_EVENBOO-REGISTER_DTO
+export class RegisterDto {
+  @IsNotEmpty()
+  fullName: string;
 
-    @IsEmail()
-    email: string;
+  @IsEmail()
+  email: string;
 
-    @IsString()
-    phone: string;
+  @IsString()
+  phone: string;
 
-    @MinLength(6)
-    password: string;
+  @MinLength(6)
+  password: string;
 
-    @MinLength(6)
-    ConfirmPassword: string;
+  @MinLength(6)
+  ConfirmPassword: string;
 }
