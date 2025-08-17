@@ -7,12 +7,12 @@ import {
   ManyToMany,
 } from 'typeorm';
 import { User } from '../Participant/part.entity';
-@Entity('Organizers')
-export class Organizer {
+@Entity('Admins')
+export class Admin {
   @PrimaryColumn()
   id: number;
 
-  @Column({ name: 'UserName', type: 'varchar', length: 100, unique: true })
+  @Column({ name: 'AdminName', type: 'varchar', length: 100, unique: true })
   userName: string;
 
   @Column({ name: 'FullName', type: 'varchar', length: 150 })
@@ -21,9 +21,12 @@ export class Organizer {
   @Column({ name: 'IsActive', default: false })
   isActive: boolean;
 
+  @Column({ name: 'Pasword'})
+  password: string;
+
   @BeforeInsert()
   generateId() {
-    this.id = Math.floor(Math.random() * 1000);
+    this.id = Math.floor(Math.random() * 10000000);
   }
 }
 

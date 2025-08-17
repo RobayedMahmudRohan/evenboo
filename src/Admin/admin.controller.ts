@@ -1,21 +1,21 @@
 import {Controller,Get,Param,Post,Body,UseInterceptors,UploadedFile,Res,UsePipes,ValidationPipe, Delete} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AdminService } from './admin.service';
-import { userdata, organizerdata,CreateOrganizerDto } from './admin.dto';
+import { userdata, organizerdata,CreateAdminrDto } from './admin.dto';
 import { MulterError, diskStorage } from 'multer';
-import { Organizer } from './admin.entity';
+import { Admin } from './admin.entity';
 
 @Controller('Admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
- @Post('createorg')
-  create(@Body() dto: CreateOrganizerDto) {
+  @Post('createadmin')
+  create(@Body() dto: CreateAdminrDto) {
     return this.adminService.create(dto);
   }
 
   @Get('username/:username')
-  async findByUserName(@Param('username') username: string): Promise<Organizer | null> {
+  async findByUserName(@Param('username') username: string): Promise<Admin | null> {
     return this.adminService.findByUserName(username);
   }
 

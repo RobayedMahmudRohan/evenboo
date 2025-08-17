@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
-import { Organizer, Event } from './admin.entity';
+import { Admin, Event } from './admin.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
-  imports: [TypeOrmModule.forFeature([Organizer, Event])],
+  imports: [TypeOrmModule.forFeature([Admin, Event])],
   controllers: [AdminController],
   providers: [AdminService],
 })

@@ -1,32 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { userdata, CreateOrganizerDto } from './admin.dto';
+import { userdata, CreateAdminrDto } from './admin.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
-import { Organizer } from './admin.entity';
+import { Admin } from './admin.entity';
 
 @Injectable()
 export class AdminService {
   constructor(
-    @InjectRepository(Organizer)
-    private readonly organizerRepo: Repository<Organizer>,
+    @InjectRepository(Admin)
+    private readonly organizerRepo: Repository<Admin>,
   ) {}
 
-  async create(org: CreateOrganizerDto) {
+  async create(org: CreateAdminrDto) {
     const user = this.organizerRepo.create(org);
     return await this.organizerRepo.save(user);
   }
 
-  async findAll(): Promise<Organizer[]> {
+  async findAll(): Promise<Admin[]> {
     return await this.organizerRepo.find();
   }
 
-  async findByFullNameSubstring(substring: string): Promise<Organizer | null> {
+  async findByFullNameSubstring(substring: string): Promise<Admin | null> {
     return await this.organizerRepo.findOne({
       where: { fullName: Like(`%${substring}%`) },
     });
   }
 
-  async findByUserName(username: string): Promise<Organizer | null> {
+  async findByUserName(username: string): Promise<Admin | null> {
     return await this.organizerRepo.findOneBy({ userName: username });
   }
 

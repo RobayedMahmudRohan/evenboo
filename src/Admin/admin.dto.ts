@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsNotEmpty, IsNumber, Length, Matches, IsNumberString, IsIn, IsOptional, IsBoolean, IsInt, Min, isNotEmpty } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, IsNumber, Length, Matches, IsNumberString, IsIn, IsOptional, IsBoolean, IsInt, Min, isNotEmpty, isString } from 'class-validator';
 export class userdata{
     @IsString()
     @IsNotEmpty()
@@ -53,9 +53,10 @@ export class organizerdata{
     opassword: string;
 
 }
-export class CreateOrganizerDto {
+export class CreateAdminrDto {
   @IsString()
   @IsNotEmpty()
+  @Matches(/^[A-Za-z]+$/, {message: 'Name must contain only letters (no numbers or symbols)',})
   userName: string;
 
   @IsString()
@@ -65,5 +66,12 @@ export class CreateOrganizerDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @IsString()
+  @IsNotEmpty()
+  @Length(6,32)
+  @Matches(/^(?=.*[A-Z]).*$/, {message: 'Password must contain at least one uppercase letter',})
+  password: string;
+  
 }
 
