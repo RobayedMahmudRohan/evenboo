@@ -1,17 +1,44 @@
-import { Entity, PrimaryGeneratedColumn, Column, Generated } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BeforeInsert,
+} from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
-@Entity('Event')
+@Entity('UserAsOrganizer')
 export class OrgEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  @Generated('uuid')
+  @Column({ type: 'varchar', length: 36, unique: true, name: 'unique_id' })
   uniqueId: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  eventDate: Date;
+  @Column({ type: 'varchar', length: 100, name: 'fullname' })
+  fullname: string;
 
-  @Column({ type: 'varchar', length: 30, default: 'Unknown' })
-  eventCountry: string;
+  @Column({ type: 'varchar', length: 100, unique: true, name: 'email' })
+  email: string;
+
+  @Column({ type: 'varchar', length: 20, name: 'phone_number' })
+  phoneNumber: string;
+
+  @Column({ type: 'varchar', length: 255, select: false, name: 'password' })
+  password: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true, name: 'image' })
+  image: string | null;
+
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+  updatedAt: Date;
+
+  @BeforeInsert()
+  generateUniqueId() {
+    this.uniqueId = uuidv4();
+  }
 }
