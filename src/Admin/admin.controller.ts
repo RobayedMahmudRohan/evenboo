@@ -1,17 +1,29 @@
-import {Controller,Get,Param,Post,Body,UseInterceptors,UploadedFile,Res,UsePipes,ValidationPipe, Delete} from '@nestjs/common';
+import {Controller,Get,Param,Post,Body,Put,UseInterceptors,UploadedFile,Res,UsePipes,ValidationPipe, Delete, Patch,ParseIntPipe,UseGuards} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AdminService } from './admin.service';
 import { userdata, organizerdata,CreateAdminrDto } from './admin.dto';
 import { MulterError, diskStorage } from 'multer';
-import { Admin } from './admin.entity';
+import { Admin,Organizer } from './admin.entity';
+import { JwtAuthGuard } from './jwt-admin.guard';
 
 @Controller('Admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post('createadmin')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe())
   create(@Body() dto: CreateAdminrDto) {
     return this.adminService.create(dto);
+  }
+
+  @Post(':id/organizer')
+  @UsePipes(new ValidationPipe())
+  async addOrganizer(
+    @Param('id', ParseIntPipe) adminId: number,
+    @Body() organizerData: Partial<Organizer>,
+  ): Promise<Organizer> {
+    return this.adminService.createOrganizer(adminId, organizerData);
   }
 
   @Get('username/:username')
@@ -19,7 +31,7 @@ export class AdminController {
     return this.adminService.findByUserName(username);
   }
 
-  @Delete('deleteuser/:username')
+  @Delete('deleteadmin/:username')
   async removeByUserName(@Param('username') username: string): Promise<void> {
     await this.adminService.removeByUserName(username);
   }
@@ -29,59 +41,32 @@ export class AdminController {
     return this.adminService.findByFullNameSubstring(substring);
   }
 
-
-  @Get('alluser')
-  loadUser(): string {
-    return this.adminService.loadUser();
+  @Patch(':id/is-active')
+  async updateIsActive(
+    @Param('id') id: number,
+    @Body('isActive') isActive: boolean,
+  ) {
+    return this.adminService.updateIsActive(id, isActive);
   }
 
-  @Get('allorganizer')
-  loadOrganizer(): string {
-    return this.adminService.loadOrganizer();
+  @Post('login')
+  async login(@Body() body: { userName: string; password: string }) {
+    return this.adminService.login(body.userName, body.password);
   }
 
-  @Get('events')
-  loadEvent(): string {
-    return this.adminService.loadEvent();
+  @Put(':id/password')
+  @UseGuards(JwtAuthGuard)
+  async changePassword(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('password') newPassword: string,
+  ): Promise<Admin> {
+    return this.adminService.updatePassword(id, newPassword);
   }
 
-  @Get(':uid')
-  searchUserByID(@Param('uid') uid: number): string {
-    return this.adminService.searchUserByID(uid);
+  @Get(':id/organizers')
+  async getOrganizers(@Param('id', ParseIntPipe) id: number) {
+    return this.adminService.getAdminWithOrganizers(id);
   }
-  @Post('adduser')
-  @UsePipes(new ValidationPipe())
-  addUser(@Body() userdata: userdata): object {
-    return this.adminService.addUsers(userdata);
-  }
-
-  @Post('addorg')
-  @UsePipes(new ValidationPipe())
-  @UseInterceptors(
-    FileInterceptor('opp', {
-      fileFilter: (req, file, cb) => {
-        if (file.originalname.match(/^.*\.(jpg|webp|png|jpeg)$/))
-          cb(null, true);
-        else {
-          cb(new MulterError('LIMIT_UNEXPECTED_FILE', 'image'), false);
-        }
-      },
-      limits: { fileSize: 3000000 },
-      storage: diskStorage({
-        destination: './uploads',
-        filename: function (req, file, cb) {
-          cb(null, Date.now() + file.originalname);
-        },
-      }),
-    }),
-  )
-  uploadFiles(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() organizerdata: organizerdata,
-  ): void {
-    console.log(file.filename);
-    console.log(organizerdata);
-
-  }
+  
 
 }

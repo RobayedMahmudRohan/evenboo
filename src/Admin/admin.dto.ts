@@ -56,11 +56,12 @@ export class organizerdata{
 export class CreateAdminrDto {
   @IsString()
   @IsNotEmpty()
-  @Matches(/^[A-Za-z]+$/, {message: 'Name must contain only letters (no numbers or symbols)',})
+  // @Matches(/^[A-Za-z]+$/, {message: 'Name must contain only letters (no numbers or symbols)',})
   userName: string;
 
   @IsString()
   @IsNotEmpty()
+  @Matches(/^[A-Za-z ]+$/, {message: 'Name must contain only letters and spaces (no numbers or symbols)',})
   fullName: string;
 
   @IsBoolean()
