@@ -5,8 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
+  OneToMany,
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import { FunctionEntity } from './function.entity';
 
 @Entity('UserAsOrganizer')
 export class OrgEntity {
@@ -36,6 +38,9 @@ export class OrgEntity {
 
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
   updatedAt: Date;
+
+  @OneToMany(() => FunctionEntity, (func: FunctionEntity) => func.organizer, { cascade: true })
+  functions: FunctionEntity[];
 
   @BeforeInsert()
   generateUniqueId() {

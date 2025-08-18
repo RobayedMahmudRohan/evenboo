@@ -6,20 +6,20 @@ import { PassportModule } from '@nestjs/passport';
 import { OrgController } from './org.controller';
 import { OrgService } from './org.service';
 import { OrgEntity } from './org.entity';
+import { FunctionEntity } from './function.entity';
 import { JwtStrategy } from '../auth-org/jwt.strategy';
 import { JwtAuthGuard } from '../auth-org/jwt-auth.guard';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([OrgEntity]),
+    TypeOrmModule.forFeature([OrgEntity, FunctionEntity]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET') || 'yourSecretKey',
-        signOptions: 
-        {
+        signOptions: {
           expiresIn: configService.get('JWT_EXPIRES_IN') || '24h',
         },
       }),

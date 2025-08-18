@@ -6,6 +6,7 @@ import {
   IsOptional,
   MaxLength,
   Matches,
+  IsDateString,
 } from 'class-validator';
 
 export class OrgData {
@@ -60,4 +61,24 @@ export class UpdatePasswordData {
   @MinLength(6)
   @MaxLength(50)
   newPassword: string;
+}
+
+// New DTOs for Function creation
+export class FunctionData {
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(150)
+  title: string;
+
+  @IsNotEmpty()
+  @IsString()
+  description: string;
+
+  @IsNotEmpty()
+  @IsDateString()
+  date: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
 }

@@ -1,4 +1,3 @@
-// src/Organizer/org.controller.ts
 import {
   Controller,
   Get,
@@ -19,12 +18,35 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { OrgService } from './org.service';
-import { OrgData, LoginData, UpdatePasswordData } from './org.dto';
-import { JwtAuthGuard  } from '../auth-org/jwt-auth.guard';
+import { OrgData, LoginData, UpdatePasswordData, FunctionData } from './org.dto';
+import { JwtAuthGuard } from '../auth-org/jwt-auth.guard';
 
 @Controller('organizer')
 export class OrgController {
   constructor(private readonly orgService: OrgService) {}
+
+  @Post('function')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  createFunction(@Request() req: any, @Body() dto: FunctionData) {
+    return this.orgService.createFunction(req.user.userId || req.user.sub, dto);
+  }
+
+  @Get('functions')
+  getAllFunctions() {
+    return this.orgService.getAllFunctions();
+  }
+
+  @Get('functions/me')
+  @UseGuards(JwtAuthGuard)
+  getMyFunctions(@Request() req: any) {
+    return this.orgService.getMyFunctions(req.user.userId || req.user.sub);
+  }
+
+  @Get('function/:id')
+  getFunctionById(@Param('id', ParseIntPipe) id: number) {
+    return this.orgService.getFunctionById(id);
+  }
 
   @Post('register')
   @UseInterceptors(

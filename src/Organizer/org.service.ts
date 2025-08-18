@@ -1,4 +1,3 @@
-// src/Organizer/org.service.ts
 import {
   Injectable,
   InternalServerErrorException,
@@ -12,16 +11,61 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
 import * as path from 'path';
-import { OrgData, LoginData, UpdatePasswordData } from './org.dto';
+import { OrgData, LoginData, UpdatePasswordData, FunctionData } from './org.dto';
 import { OrgEntity } from './org.entity';
+import { FunctionEntity } from './function.entity';
 
 @Injectable()
 export class OrgService {
   constructor(
     @InjectRepository(OrgEntity)
     private orgRepository: Repository<OrgEntity>,
+    @InjectRepository(FunctionEntity)
+    private functionRepository: Repository<FunctionEntity>,
     private jwtService: JwtService,
   ) {}
+
+
+  // Create Function by Organizer
+  async createFunction(userId: number, dto: FunctionData) {
+    const organizer = await this.orgRepository.findOne({ where: { id: userId } });
+    if (!organizer) throw new NotFoundException('Organizer not found');
+
+    const newFunction = this.functionRepository.create({
+      ...dto,
+      date: new Date(dto.date),
+      organizer,
+    });
+
+    return await this.functionRepository.save(newFunction);
+  }
+
+  // Get all functions with organizer info
+  async getAllFunctions() {
+    return this.functionRepository.find({
+      relations: ['organizer'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  // Get functions created by specific organizer
+  async getMyFunctions(userId: number) {
+    return this.functionRepository.find({
+      where: { organizer: { id: userId } },
+      relations: ['organizer'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  // Get function by id
+  async getFunctionById(id: number) {
+    const func = await this.functionRepository.findOne({
+      where: { id },
+      relations: ['organizer'],
+    });
+    if (!func) throw new NotFoundException('Function not found');
+    return func;
+  }
 
   // Register
   async createOrg(orgData: OrgData) {
@@ -43,7 +87,7 @@ export class OrgService {
 
     return {
       message: 'Successfully registered',
-      //access_token: token,
+      access_token: token,
       user: {
         id: saved.id,
         fullname: saved.fullname,
