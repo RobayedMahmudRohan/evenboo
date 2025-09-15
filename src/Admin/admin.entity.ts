@@ -58,7 +58,7 @@ export class Organizer {
   @Column({ type: 'varchar', length: 100 })
   opassword: string;
 
-  @ManyToOne(() => Admin, (admin) => admin.organizers, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Admin, (admin) => admin.organizers, { onDelete: 'CASCADE', nullable:true })
   admin: Admin;
 
   @BeforeInsert()

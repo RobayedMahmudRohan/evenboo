@@ -11,7 +11,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post('createadmin')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe())
   create(@Body() dto: CreateAdminrDto) {
     return this.adminService.create(dto);
@@ -31,10 +31,10 @@ export class AdminController {
     return this.adminService.findByUserName(username);
   }
 
-  @Delete('deleteadmin/:username')
-  async removeByUserName(@Param('username') username: string): Promise<void> {
-    await this.adminService.removeByUserName(username);
-  }
+  // @Delete('deleteadmin/:username')
+  // async removeByUserName(@Param('username') username: string): Promise<void> {
+  //   await this.adminService.removeByUserName(username);
+  // }
 
   @Get('search/:substring')
   async searchByFullName(@Param('substring') substring: string) {
@@ -67,6 +67,54 @@ export class AdminController {
   async getOrganizers(@Param('id', ParseIntPipe) id: number) {
     return this.adminService.getAdminWithOrganizers(id);
   }
-  
+  @Get('allorganizers')
+async getAllOrganizers() {
+  return this.adminService.findAllOrganizer();
+}
+
+@Post('addorg')
+async addorganizer(@Body() data: Partial<Organizer>): Promise<Organizer> {
+  if (data.admin?.id === undefined) {
+    return this.adminService.addorganizer(0, data); // or throw error if admin is required
+  }
+  return this.adminService.addorganizer(data.admin.id, data);
+}
+
+  // PUT update organizer
+  @Put('updateorganizer/:id')
+  async updateOrganizer(
+    @Param('id') id: number,
+    @Body() data: Partial<Organizer>,
+  ): Promise<Organizer> {
+    return this.adminService.updateOrganizer(Number(id), data);
+  }
+
+  // DELETE organizer
+  @Delete('deleteorganizer/:id')
+  async deleteOrganizer(@Param('id') id: number): Promise<{ message: string }> {
+    await this.adminService.deleteOrganizer(Number(id));
+    return { message: `Organizer with id ${id} deleted successfully` };
+  }
+
+  //admin 
+
+  @Get('alladmins')
+async findAll(): Promise<Admin[]> {
+  return this.adminService.findAllAdmins();
+}
+
+@Put('updateadmin/:id')
+async updateAdmin(
+  @Param('id', ParseIntPipe) id: number,
+  @Body() data: Partial<Admin>,
+): Promise<Admin> {
+  return this.adminService.updateAdmin(id, data);
+}
+
+@Delete('deleteadmin/:id')
+async deleteAdmin(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
+  await this.adminService.deleteAdmin(id);
+  return { message: `Admin with id ${id} deleted successfully` };
+}
 
 }

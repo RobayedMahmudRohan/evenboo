@@ -110,4 +110,99 @@ export class AdminService {
       relations: ['organizers'],
     });
   }
+  //get all organizers
+  async findAllOrganizer(): Promise<Organizer[]> {
+  return await this.organizerRepo.find();
+  }
+    // Create organizer
+ async addorganizer(adminId: number | null, organizerData: Partial<Organizer>): Promise<Organizer> {
+  let admin: Admin | undefined;
+
+  if (adminId !== null) {
+    const foundAdmin = await this.adminRepo.findOne({ where: { id: adminId } });
+    if (!foundAdmin) throw new NotFoundException(`Admin with id ${adminId} not found`);
+    admin = foundAdmin; // assign only if found
+  }
+
+  if (organizerData.opassword) {
+    const salt = await bcrypt.genSalt(10);
+    organizerData.opassword = await bcrypt.hash(organizerData.opassword, salt);
+  }
+
+  const organizer = this.organizerRepo.create({ ...organizerData, admin });
+  return this.organizerRepo.save(organizer);
+}
+
+
+
+
+  // Update organizer
+  async updateOrganizer(
+  id: number,
+  organizerData: Partial<Organizer>,
+): Promise<Organizer> {
+  const organizer = await this.organizerRepo.findOne({ where: { id }, relations: ['admin'] });
+  if (!organizer) {
+    throw new NotFoundException(`Organizer with id ${id} not found`);
+  }
+
+  // Update fields if they exist in organizerData
+  if (organizerData.oname !== undefined) organizer.oname = organizerData.oname;
+  if (organizerData.oemail !== undefined) organizer.oemail = organizerData.oemail;
+  if (organizerData.ogender !== undefined) organizer.ogender = organizerData.ogender;
+  if (organizerData.opnumber !== undefined) organizer.opnumber = organizerData.opnumber;
+  if (organizerData.opassword !== undefined) {
+    const salt = await bcrypt.genSalt(10);
+    organizer.opassword = await bcrypt.hash(organizerData.opassword, salt);
+  }
+  if (organizerData.admin?.id !== undefined) {
+    const admin = await this.adminRepo.findOne({ where: { id: organizerData.admin.id } });
+    if (!admin) throw new NotFoundException(`Admin with id ${organizerData.admin.id} not found`);
+    organizer.admin = admin;
+  }
+
+  // Save updated entity
+  return this.organizerRepo.save(organizer);
+}
+
+
+  // Delete organizer
+  async deleteOrganizer(id: number): Promise<void> {
+    const result = await this.organizerRepo.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Organizer with id ${id} not found`);
+    }
+  }
+
+
+  //admin
+
+  // Get all admins
+async findAllAdmins(): Promise<Admin[]> {
+  return this.adminRepo.find();
+}
+
+// Update admin (username, fullName, isActive, etc.)
+async updateAdmin(id: number, data: Partial<Admin>): Promise<Admin> {
+    // never allow changing the primary key accidentally
+    if ((data as any).id) delete (data as any).id;
+
+    // find existing admin
+    const admin = await this.adminRepo.findOne({ where: { id } });
+    if (!admin) {
+      throw new NotFoundException(`Admin with id ${id} not found`);
+    }
+
+    // merge incoming data into the entity and save
+    const merged = this.adminRepo.merge(admin, data);
+    const saved = await this.adminRepo.save(merged);
+
+    return saved;
+  }
+
+// Delete admin by ID
+async deleteAdmin(id: number): Promise<void> {
+  await this.adminRepo.delete(id);
+}
+
 }
